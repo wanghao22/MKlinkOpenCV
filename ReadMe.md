@@ -8,7 +8,7 @@
 >
 > 但是这个需要在环境变量中添加opencv的路径的，例如我的部分环境如下：
 >
-> ![image-20210310151842852](.\img\EnvironmentVar.png)
+> ![img\EnvironmentVar.png](.\img\EnvironmentVar.png)
 >
 > | 变量       | 值                          |
 > | ---------- | --------------------------- |
