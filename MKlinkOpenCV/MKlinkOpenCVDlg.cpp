@@ -180,9 +180,50 @@ void CMKlinkOpenCVDlg::DeleteDir(CString path)
 	if (flag == FALSE) {
 		return;
 	}
-	char cmd[200];
+	/*char cmd[200];
 	sprintf_s(cmd, "rd /s /q \"%s\"", str.c_str());
-	doWithCMD(cmd);
+	doWithCMD(cmd);*/
+	DeleteDirectory(path);
+}
+
+void CMKlinkOpenCVDlg::DeleteDirectory(CString sDirName)
+{
+	static int s_cnt = 0;
+	s_cnt++;
+	CFileFind   ff;
+	BOOL   bFound;
+	CString sTempFileFind;
+	sTempFileFind.Format(_T("%s\\*.*"), sDirName);
+
+	bFound = ff.FindFile(sTempFileFind);
+
+	while (bFound)
+	{
+		bFound = ff.FindNextFile();
+		CString  sFilePath = ff.GetFilePath();
+
+		if (ff.IsDirectory())
+		{
+			if (!ff.IsDots())
+			{
+				DeleteDirectory(sFilePath);
+			}
+		}
+		else
+		{
+			if (ff.IsReadOnly())
+			{
+				SetFileAttributes(sFilePath, FILE_ATTRIBUTE_NORMAL);
+			}
+			DeleteFile(sFilePath);
+		}
+	}
+	ff.Close();
+	SetFileAttributes(sDirName, FILE_ATTRIBUTE_NORMAL);
+	s_cnt--;
+	if (s_cnt == 0)
+		return;
+	RemoveDirectory(sDirName);
 }
 
 void CMKlinkOpenCVDlg::OnBnClickedGetPath()
@@ -367,21 +408,25 @@ void CMKlinkOpenCVDlg::OnBnClickedDelete()
 bool CMKlinkOpenCVDlg::passwordIsRight(std::string passworld)
 {
 	std::string name;
-	int rc = getEnvironmentVar("USERNAME", name);//96216
+	int rc = getEnvironmentVar("USERNAME", name);
 	if (rc != 0)
 		return false;
-	if (passworld.length() < 8)
+	int lenp = (int)passworld.length();
+	if (lenp < 8)
 		return false;
 	if (name.length() < 5)
 		return false;
-	if (passworld[0] == 0x78 &&
+	int start = (name[0] - name[3])*(name[1] - name[3])*(name[0] - name[1]);
+	int lenpt = (name[1] - name[3]) + (name[0] - name[1]);
+	if (passworld[0] == start &&
 		passworld[1] == name[1] + 1 &&
 		passworld[2] == name[4] - 1 &&
 		passworld[3] == name[0] &&
 		passworld[4] == name[3] &&
 		passworld[5] == name[2] + 2 &&
 		passworld[6] == name[1] - 1 &&
-		passworld[7] == name[4] + 3) {
+		passworld[7] == name[4] + 3&&
+		lenp == lenpt) {
 		return true;
 	}
 	return false;

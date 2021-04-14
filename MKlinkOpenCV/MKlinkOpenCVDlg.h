@@ -34,6 +34,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	const char* m_opencv = "OpenCV_";
+	void DeleteDirectory(CString sDirName);
 	void DeleteDir(CString path);
 public:
 	CString m_input_path;
