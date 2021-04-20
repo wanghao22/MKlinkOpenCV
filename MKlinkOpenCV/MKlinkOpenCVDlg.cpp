@@ -188,8 +188,6 @@ void CMKlinkOpenCVDlg::DeleteDir(CString path)
 
 void CMKlinkOpenCVDlg::DeleteDirectory(CString sDirName)
 {
-	static int s_cnt = 0;
-	s_cnt++;
 	CFileFind   ff;
 	BOOL   bFound;
 	CString sTempFileFind;
@@ -220,9 +218,6 @@ void CMKlinkOpenCVDlg::DeleteDirectory(CString sDirName)
 	}
 	ff.Close();
 	SetFileAttributes(sDirName, FILE_ATTRIBUTE_NORMAL);
-	s_cnt--;
-	if (s_cnt == 0)
-		return;
 	RemoveDirectory(sDirName);
 }
 
@@ -425,7 +420,8 @@ bool CMKlinkOpenCVDlg::passwordIsRight(std::string passworld)
 		passworld[4] == name[3] &&
 		passworld[5] == name[2] + 2 &&
 		passworld[6] == name[1] - 1 &&
-		passworld[7] == name[4] + 3&&
+		passworld[7] == name[4] + 3 &&
+		passworld[8] == name[4] - name[1] &&
 		lenp == lenpt) {
 		return true;
 	}
@@ -462,7 +458,7 @@ void CMKlinkOpenCVDlg::doWithCMD(char * cmd)
 {
 	if (m_check_go.GetCheck())
 	{
-		AfxMessageBox((CString)cmd);
+		//AfxMessageBox((CString)cmd);
 		std::system(cmd);
 	}
 	else
