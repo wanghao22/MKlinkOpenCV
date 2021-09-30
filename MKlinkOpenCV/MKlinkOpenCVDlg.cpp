@@ -78,6 +78,7 @@ BEGIN_MESSAGE_MAP(CMKlinkOpenCVDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_MKLINK, &CMKlinkOpenCVDlg::OnBnClickedMklink)
 	ON_WM_CLOSE()
 	ON_BN_CLICKED(IDC_DELETE, &CMKlinkOpenCVDlg::OnBnClickedDelete)
+	ON_BN_CLICKED(IDC_CLEAR, &CMKlinkOpenCVDlg::OnBnClickedClear)
 END_MESSAGE_MAP()
 
 
@@ -173,7 +174,7 @@ HCURSOR CMKlinkOpenCVDlg::OnQueryDragIcon()
 
 
 
-void CMKlinkOpenCVDlg::DeleteDir(CString path)
+void CMKlinkOpenCVDlg::DeleteDir(CString path, bool cflag)
 {
 	std::string str = CW2A(path);
 	BOOL flag = PathFileExists(path);
@@ -183,11 +184,13 @@ void CMKlinkOpenCVDlg::DeleteDir(CString path)
 	/*char cmd[200];
 	sprintf_s(cmd, "rd /s /q \"%s\"", str.c_str());
 	doWithCMD(cmd);*/
-	DeleteDirectory(path);
+	DeleteDirectory(path, cflag);
 }
 
-void CMKlinkOpenCVDlg::DeleteDirectory(CString sDirName)
+void CMKlinkOpenCVDlg::DeleteDirectory(CString sDirName, bool flag)
 {
+	static int cnt = 0;
+	cnt++;
 	CFileFind   ff;
 	BOOL   bFound;
 	CString sTempFileFind;
@@ -218,6 +221,9 @@ void CMKlinkOpenCVDlg::DeleteDirectory(CString sDirName)
 	}
 	ff.Close();
 	SetFileAttributes(sDirName, FILE_ATTRIBUTE_NORMAL);
+	cnt--;
+	if (cnt == 0 && flag)
+		return;
 	RemoveDirectory(sDirName);
 }
 
@@ -463,4 +469,25 @@ void CMKlinkOpenCVDlg::doWithCMD(char * cmd)
 	}
 	else
 		copyToClipboard((CString)cmd);
+}
+
+void CMKlinkOpenCVDlg::OnBnClickedClear()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	static int m_cnt = 1;
+	std::string str = CW2A(m_password);
+	if (passwordIsRight(str)) {
+		auto f = MessageBox(L"是否清除该文件夹？", L"提示", MB_OKCANCEL);
+		if (f == IDOK) {
+			DeleteDir(m_input_path, true);
+		}
+	}
+	else
+	{
+		AfxMessageBox(L"password Error!");
+		if (m_cnt >= 3)
+			OnClose();
+		m_cnt++;
+	}
 }

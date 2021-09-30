@@ -34,8 +34,8 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	const char* m_opencv = "OpenCV_";
-	void DeleteDirectory(CString sDirName);
-	void DeleteDir(CString path);
+	void DeleteDirectory(CString sDirName, bool flag = false);
+	void DeleteDir(CString path, bool flag = false);
 public:
 	CString m_input_path;
 	afx_msg void OnBnClickedGetPath();
@@ -56,4 +56,5 @@ public:
 	void copyToClipboard(CString source);
 	CButton m_check_go;
 	void doWithCMD(char* cmd);
+	afx_msg void OnBnClickedClear();
 };
